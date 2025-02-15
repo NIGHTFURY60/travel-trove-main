@@ -6,6 +6,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Travel Platform - Profile</title>
   <link rel="stylesheet" href="profile.css" />
+  <style>
+    /* Modal styling for Travel Plan */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+    .modal-content {
+      background-color: #1c1c1c;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 10px;
+      color: #fff;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .modal-content form label {
+      display: block;
+      margin-top: 10px;
+    }
+    .modal-content form input,
+    .modal-content form select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .modal-content form button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      background-color: #38ef70;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .modal-content form button:hover {
+      background-color: #32d966;
+    }
+    /* Styles for travel history cards */
+    .activity-card {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .activity-card .summary {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .activity-card .details {
+      font-size: 0.9rem;
+      color: #d3d3d3;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 
 <body>
@@ -27,18 +108,56 @@
   <div class="container">
     <!-- Header Section -->
     <div class="header-section">
-      <div class="profile-image">
-        <img id="profile-img" src="resources/1-intro-photo-final.jpg" alt="User Image"
-          onclick="document.getElementById('profile-upload').click();" />
-        <input type="file" id="profile-upload" accept="image/*" style="display:none;"
-          onchange="updateProfileImage(this)" />
-      </div>
       <div class="user-info">
-        <input type="text" id="user-name" value="John Doe" oninput="updateName(this.value)" />
+        <input type="text" id="user-name" value="" placeholder="Your Name" oninput="updateName(this.value)" />
         <button class="edit-button" onclick="editProfile()">✏ Edit Profile</button>
-        <p>Location: <span id="user-location">New York, USA</span></p>
+        <p><span id="user-location"></span></p>
       </div>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async function() {
+        // Retrieve the signed-in user's username from localStorage.
+        const storedUserName = localStorage.getItem("username");
+        if (!storedUserName) {
+          console.log("No username found in localStorage.");
+          return;
+        }
+        try {
+          // Fetch user details from the backend.
+          const userResponse = await fetch(`http://127.0.0.1:5003/user/${storedUserName}`);
+          if (!userResponse.ok) {
+            console.error("Failed to fetch user details.");
+            return;
+          }
+          const userData = await userResponse.json();
+          // Update the name field.
+          document.getElementById("user-name").value = userData.username;
+          // Store username_id for travel plan usage.
+          localStorage.setItem("username_id", userData.username_id);
+          // Use the location_id from the user data to fetch location details.
+          const locationID = userData.location_id;
+          if (locationID) {
+            const locationResponse = await fetch(`http://127.0.0.1:5003/location/${locationID}`);
+            if (!locationResponse.ok) {
+              console.error("Failed to fetch location details.");
+              document.getElementById("user-location").innerText = "Location not found";
+              return;
+            }
+            const locationData = await locationResponse.json();
+            // Update the location element with separate titles for locality, state, and country.
+            document.getElementById("user-location").innerHTML =
+              `Locality: ${locationData.location_name}<br>` +
+              `State: ${locationData.state_name}<br>` +
+              `Country: ${locationData.country_name}`;
+          } else {
+            document.getElementById("user-location").innerText = "Location not set";
+          }
+        } catch (error) {
+          console.error("Error fetching user or location details:", error);
+        }
+      });
+    </script>
 
     <!-- Bio Section -->
     <div class="bio-section">
@@ -50,10 +169,7 @@
     <div class="preferences-section">
       <h3>Travel Preferences</h3>
       <div class="preferences-list">
-        <span class="preference" contenteditable="true" onblur="updatePreferences(this)">Hiking</span>
-        <span class="preference" contenteditable="true" onblur="updatePreferences(this)">Cultural Experiences</span>
-        <span class="preference" contenteditable="true" onblur="updatePreferences(this)">Beach</span>
-        <span class="preference" contenteditable="true" onblur="updatePreferences(this)">Adventure</span>
+        <!-- Dynamic travel preferences (user tags) will be inserted here -->
       </div>
     </div>
 
@@ -61,17 +177,10 @@
     <div class="past-activities">
       <h3>Past Activities / History</h3>
       <div class="activity-cards">
-        <div class="activity-card" onclick="location.href='activity.html?id=1'">
-          <img src="resources/bali.jpeg" alt="Activity Thumbnail" />
-          <h4>Visited Bali</h4>
-          <p>Beach Vacation - June 2022</p>
-        </div>
-        <div class="activity-card" onclick="location.href='activity.html?id=2'">
-          <img src="resources/colorado.jpeg" alt="Activity Thumbnail" />
-          <h4>Hiking in Colorado</h4>
-          <p>Mountain Adventure - September 2022</p>
-        </div>
+        <!-- Dynamic travel history cards will be inserted here -->
       </div>
+      <!-- "Enter Travel Plan" Button -->
+      <button class="edit-button" onclick="openTravelPlanModal()">Enter Travel Plan</button>
     </div>
 
     <!-- Bookings Section -->
@@ -96,6 +205,297 @@
     </div>
   </div>
 
+  <!-- Modal for Entering Travel Plan -->
+  <div id="travelPlanModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeTravelPlanModal()">&times;</span>
+      <h2>Enter Your Travel Plan</h2>
+      <form id="travelPlanForm">
+        <label for="travel_type">Travel Type (Mode of Transport):</label>
+        <select id="travel_type" name="travel_type" required>
+          <option value="">Select mode of transport</option>
+          <option value="bus">Bus</option>
+          <option value="car">Car</option>
+          <option value="bike">Bike</option>
+          <option value="plane">Plane</option>
+          <option value="train">Train</option>
+          <option value="other">Other</option>
+        </select>
+
+        <label for="travel_date">Travel Date (Day of Week):</label>
+        <select id="travel_date" name="travel_date" required>
+          <option value="">Select a day</option>
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+          <option value="Sunday">Sunday</option>
+        </select>
+
+        <label for="travel_price">Travel Price:</label>
+        <input type="number" id="travel_price" name="travel_price" required>
+
+        <label for="days">Number of Days:</label>
+        <input type="number" id="days" name="days" required>
+
+        <label for="stay">Will you stay?</label>
+        <select id="stay" name="stay" required>
+          <option value="">Select an option</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+
+        <label for="stay_price">Stay Price:</label>
+        <input type="number" id="stay_price" name="stay_price">
+
+        <label for="travel_time">Travel Time (minutes):</label>
+        <input type="number" id="travel_time" name="travel_time" required>
+
+        <label for="fromdate">From Date:</label>
+        <input type="date" id="fromdate" name="fromdate" required>
+
+        <label for="todate">To Date:</label>
+        <input type="date" id="todate" name="todate" required>
+
+        <label for="backdate">Back Date:</label>
+        <input type="date" id="backdate" name="backdate" required>
+
+        <h3>Start Location</h3>
+        <label for="start_location">Location:</label>
+        <input type="text" id="start_location" name="start_location" required>
+        <label for="start_location_state">State:</label>
+        <input type="text" id="start_location_state" name="start_location_state" required>
+        <label for="start_location_country">Country:</label>
+        <input type="text" id="start_location_country" name="start_location_country" required>
+
+        <h3>Destination</h3>
+        <label for="destination">Location:</label>
+        <input type="text" id="destination" name="destination" required>
+        <label for="destination_state">State:</label>
+        <input type="text" id="destination_state" name="destination_state" required>
+        <label for="destination_country">Country:</label>
+        <input type="text" id="destination_country" name="destination_country" required>
+
+        <button type="submit">Submit Travel Plan</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Inline JavaScript to dynamically populate Travel Preferences -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Retrieve the signed-in user's username from localStorage.
+      const username = localStorage.getItem("username");
+      if (!username) {
+        console.error("No username found in localStorage. Make sure the user is signed in.");
+        return;
+      }
+      // Construct the backend endpoint URL to fetch user tags.
+      const tagsEndpoint = `http://127.0.0.1:5003/user/${encodeURIComponent(username)}/tags`;
+      // Fetch the user's tags from the backend.
+      fetch(tagsEndpoint)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch user tags.");
+          }
+          return response.json();
+        })
+        .then(tags => {
+          // Get the container for travel preferences.
+          const preferencesList = document.querySelector('.preferences-list');
+          // Clear any existing content.
+          preferencesList.innerHTML = "";
+          // Create a span for each tag.
+          tags.forEach(tagObj => {
+            const span = document.createElement("span");
+            span.classList.add("preference");
+            // Optionally, allow the span to be edited.
+            span.contentEditable = "true";
+            // Call updatePreferences when the element loses focus (assuming updatePreferences is defined).
+            span.setAttribute("onblur", "updatePreferences(this)");
+            // Set the text content to the tag name (assuming tagObj.tag holds the tag string).
+            span.textContent = tagObj.tag;
+            // Append the span to the preferences list.
+            preferencesList.appendChild(span);
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching user tags:", error);
+        });
+    });
+  </script>
+
+  <!-- JavaScript for dynamic travel history -->
+  <script>
+    function updateTravelHistory() {
+      // Retrieve the username_id from localStorage.
+      const username_id = localStorage.getItem("username_id");
+      if (!username_id) {
+        console.error("No username_id found in localStorage.");
+        return;
+      }
+      // Construct the backend endpoint URL to fetch travel history.
+      const historyEndpoint = `http://127.0.0.1:5003/travel_data/${encodeURIComponent(username_id)}`;
+      fetch(historyEndpoint)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch travel history.");
+          }
+          // Since backend returns a JSON string, get text and then parse it.
+          return response.text();
+        })
+        .then(data => {
+          let travelHistory = [];
+          try {
+            travelHistory = JSON.parse(data);
+          } catch (e) {
+            console.error("Error parsing travel history JSON:", e);
+            return;
+          }
+          // If travelHistory is still a string, try parsing it again.
+          if (typeof travelHistory === "string") {
+            try {
+              travelHistory = JSON.parse(travelHistory);
+            } catch (e) {
+              console.error("Error parsing nested travel history JSON:", e);
+              return;
+            }
+          }
+          if (!Array.isArray(travelHistory)) {
+            console.error("Parsed travel history is not an array:", travelHistory);
+            return;
+          }
+          console.log("Travel history:", travelHistory);
+          const activityCardsContainer = document.querySelector('.activity-cards');
+          // Clear any existing content.
+          activityCardsContainer.innerHTML = "";
+          travelHistory.forEach(plan => {
+            // Create a card div.
+            const card = document.createElement("div");
+            card.classList.add("activity-card");
+            // Create a summary container.
+            const summary = document.createElement("div");
+            summary.classList.add("summary");
+            summary.textContent = "Loading...";
+            card.appendChild(summary);
+            // Create a details container (initially hidden).
+            const details = document.createElement("div");
+            details.classList.add("details");
+            details.style.display = "none";
+            details.innerHTML = `
+              <p>Travel Type: ${plan.travel_type}</p>
+              <p>Travel Price: ${plan.travel_price}</p>
+              <p>Days: ${plan.days}</p>
+              <p>Stay: ${plan.stay ? "Yes" : "No"}</p>
+              <p>Stay Price: ${plan.stay_price}</p>
+              <p>Travel Time: ${plan.travel_time}</p>
+              <p>From Date: ${plan.fromdate}</p>
+              <p>To Date: ${plan.todate}</p>
+              <p>Back Date: ${plan.backdate}</p>
+            `;
+            card.appendChild(details);
+            // When any card is clicked, toggle details for all cards.
+            card.addEventListener("click", () => {
+              const allDetails = document.querySelectorAll(".activity-card .details");
+              let openAll = false;
+              // If at least one details section is hidden, open all.
+              allDetails.forEach(detail => {
+                if (detail.style.display === "none") {
+                  openAll = true;
+                }
+              });
+              allDetails.forEach(detail => {
+                detail.style.display = openAll ? "block" : "none";
+              });
+            });
+            // Use Promise.all to fetch both start and destination location names.
+            Promise.all([
+              fetch(`http://127.0.0.1:5003/location/${plan.start_location}`).then(res => res.json()),
+              fetch(`http://127.0.0.1:5003/location/${plan.destination}`).then(res => res.json())
+            ])
+              .then(([startLocData, destLocData]) => {
+                summary.textContent = `From: ${startLocData.location_name} To: ${destLocData.location_name}`;
+              })
+              .catch(err => console.error("Error fetching location names:", err));
+            activityCardsContainer.appendChild(card);
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching travel history:", error);
+        });
+    }
+    // Call updateTravelHistory on page load and on pageshow to ensure fresh data.
+    document.addEventListener("DOMContentLoaded", () => {
+      updateTravelHistory();
+    });
+    window.addEventListener("pageshow", () => {
+      updateTravelHistory();
+    });
+  </script>
+
+  <!-- JavaScript for modal functionality and travel plan form submission -->
+  <script>
+    // Open the Travel Plan modal
+    function openTravelPlanModal() {
+      document.getElementById("travelPlanModal").style.display = "block";
+    }
+    // Close the Travel Plan modal
+    function closeTravelPlanModal() {
+      document.getElementById("travelPlanModal").style.display = "none";
+    }
+    // Handle form submission for travel plan
+    document.getElementById("travelPlanForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      // Gather form data using FormData API
+      const formData = new FormData(this);
+      // Create a JSON object from the form data.
+      const travelData = {
+        username_id: localStorage.getItem("username_id"),
+        username: localStorage.getItem("username"),
+        travel_date: formData.get("travel_date"),
+        travel_type: formData.get("travel_type"),
+        travel_price: parseFloat(formData.get("travel_price")),
+        days: parseInt(formData.get("days")),
+        stay: formData.get("stay") === "true",
+        stay_price: formData.get("stay_price") ? parseFloat(formData.get("stay_price")) : 0,
+        travel_time: parseInt(formData.get("travel_time")),
+        fromdate: formData.get("fromdate"),
+        todate: formData.get("todate"),
+        backdate: formData.get("backdate"),
+        start_location: formData.get("start_location"),
+        start_location_state: formData.get("start_location_state"),
+        start_location_country: formData.get("start_location_country"),
+        destination: formData.get("destination"),
+        destination_state: formData.get("destination_state"),
+        destination_country: formData.get("destination_country")
+      };
+      try {
+        const response = await fetch("http://127.0.0.1:5003/travel/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(travelData)
+        });
+        if (response.ok) {
+          alert("Travel plan submitted successfully!");
+          closeTravelPlanModal();
+          // Refresh the travel history without reloading the page.
+          updateTravelHistory();
+        } else {
+          const errorData = await response.json();
+          alert("Error submitting travel plan: " + errorData.detail);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error connecting to server.");
+      }
+    });
+  </script>
+
+  <!-- External script file (if you have additional functions such as updatePreferences) -->
   <script src="script.js"></script>
 </body>
 
