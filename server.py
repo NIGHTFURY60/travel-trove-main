@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
 import gridfs
 import io
 import random
+import os
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
@@ -69,4 +70,5 @@ def get_image(image_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=True)

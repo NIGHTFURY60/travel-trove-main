@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, render_template, jsonify, Response
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -7,7 +8,7 @@ from io import BytesIO
 # Flask app setup
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
-CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
+CORS(app, resources={r"/*": {"origins": "https://travel-trove-main.onrender.com"}})
 
 
 
@@ -145,6 +146,6 @@ def reply_post(post_id):
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
 if __name__ == '__main__':
-    app.run(port=5000,debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
