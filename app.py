@@ -14,7 +14,7 @@ CORS(app, resources={r"/*": {"origins": "https://travel-trove-main.onrender.com"
 
 
 
-MONGO_URI = os.environ.get("MONGO_URI")  # Get from Render environment variables
+MONGO_URI = os.environ.get("MONGO_URI", "https://travel-trove-main.onrender.com")  # Get from Render environment variables
 if not MONGO_URI:
     raise ValueError("MONGO_URI environment variable not set.")
 
@@ -39,9 +39,9 @@ def get_all_posts():
             # Convert ObjectId to string for JSON
             post["_id"] = str(post["_id"])
             if post.get("image_id"):
-                post["image_url"] = f"https://your-app.onrender.com/file/{post['image_id']}"
+                post["image_url"] = f"{MONGO_URI}/file/{post['image_id']}"
             if post.get("video_id"):
-                post["video_url"] = f"https://your-app.onrender.com/file/{post['video_id']}"
+                post["video_url"] = f"{MONGO_URI}/file/{post['video_id']}"
         return jsonify(posts), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

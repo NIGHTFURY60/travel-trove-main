@@ -18,16 +18,13 @@ client = MongoClient('mongodb+srv://nightanon038:wV86jTZpkYJ1K6Qo@travel-trove.s
 serverSelectionTimeoutMS=50000,
 db = client['travel_platform']  # Database name
 posts_collection = db['posts']
-fs = gridfs.GridFS(db)
+fs = gridfs.GridFS(db)  
 
-MONGO_URI = os.environ.get("MONGO_URI")  # Get from Render environment variables
+MONGO_URI = os.environ.get("MONGO_URI", "https://your-app.onrender.com")  # Get from Render environment variables
 if not MONGO_URI:
     raise ValueError("MONGO_URI environment variable not set.")
 
-client = MongoClient('mongodb+srv://nightanon038:wV86jTZpkYJ1K6Qo@travel-trove.sdb1i.mongodb.net/?retryWrites=true&w=majority&appName=travel-trove')
-db = client['travel_platform']
-posts_collection = db['posts']
-fs = GridFS(db)  # Use GridFS directly
+
 
 
 @app.route('/')

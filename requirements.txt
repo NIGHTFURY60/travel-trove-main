@@ -2,7 +2,7 @@ Flask==2.0.1
 flask_cors==3.0.10
 pymongo==3.12.0
 bson==0.5.10
-fastapi==0.68.1
+FastAPI==0.68.1 
 sqlalchemy==1.4.22
 pydantic==1.8.2
 passlib==1.7.4
