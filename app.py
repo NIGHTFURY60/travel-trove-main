@@ -13,14 +13,17 @@ CORS(app, resources={r"/*": {"origins": "https://travel-trove-main.onrender.com"
 
 
 
-# MongoDB and gridfs setup
-client = MongoClient('mongodb+srv://nightanon038:wV86jTZpkYJ1K6Qo@travel-trove.sdb1i.mongodb.net/?retryWrites=true&w=majority&appName=travel-trove')  # Replace with your MongoDB URI
+
+MONGO_URI = os.environ.get("MONGO_URI")  # Get from Render environment variables
+if not MONGO_URI:
+    raise ValueError("MONGO_URI environment variable not set.")
+
+
+client = MongoClient('mongodb+srv://nightanon038:wV86jTZpkYJ1K6Qo@travel-trove.sdb1i.mongodb.net/?retryWrites=true&w=majority&appName=travel-trove')
 serverSelectionTimeoutMS=50000,
-db = client['travel_platform']  # Database name
+db = client['travel_platform']
 collection = db['posts']
-fs = GridFS(db)  # GridFS for storing files
-
-
+fs = GridFS(db)
 
 
 @app.route('/')
@@ -36,11 +39,9 @@ def get_all_posts():
             # Convert ObjectId to string for JSON
             post["_id"] = str(post["_id"])
             if post.get("image_id"):
-                post["image_url"] = f"http://localhost:5000/file/{
-                    post['image_id']}"
+                post["image_url"] = f"https://your-app.onrender.com/file/{post['image_id']}"
             if post.get("video_id"):
-                post["video_url"] = f"http://localhost:5000/file/{
-                    post['video_id']}"
+                post["video_url"] = f"https://your-app.onrender.com/file/{post['video_id']}"
         return jsonify(posts), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -147,5 +148,5 @@ def reply_post(post_id):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    port = int(os.environ.get('PORT', 10000))  # Use a port like 10000 for Render
+    app.run(host='0.0.0.0', port=port, debug=False) # Set debug to False for production

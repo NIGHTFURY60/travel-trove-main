@@ -10,7 +10,7 @@ import os
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
-CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
+CORS(app, resources={r"/*": {"origins": "https://travel-trove-main.onrender.com"}})
 
 
 # Connect to MongoDB Atlas
@@ -20,6 +20,14 @@ db = client['travel_platform']  # Database name
 posts_collection = db['posts']
 fs = gridfs.GridFS(db)
 
+MONGO_URI = os.environ.get("MONGO_URI")  # Get from Render environment variables
+if not MONGO_URI:
+    raise ValueError("MONGO_URI environment variable not set.")
+
+client = MongoClient('mongodb+srv://nightanon038:wV86jTZpkYJ1K6Qo@travel-trove.sdb1i.mongodb.net/?retryWrites=true&w=majority&appName=travel-trove')
+db = client['travel_platform']
+posts_collection = db['posts']
+fs = GridFS(db)  # Use GridFS directly
 
 
 @app.route('/')
@@ -45,7 +53,7 @@ def get_posts():
         for post in trending_posts + recommended_posts:
             post['_id'] = str(post['_id'])
             if 'image_id' in post:
-                post['image_url'] = f"http://127.0.0.1:5001/image/{post['image_id']}"
+                post["image_url"] = f"https://your-app.onrender.com/file/{post['image_id']}"
             else:
                 post['image_url'] = "/static/default.jpg"  # Default placeholder
          # Check if both fields exist before sending response
@@ -70,5 +78,5 @@ def get_image(image_id):
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5001))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    port = int(os.environ.get('PORT', 10000))  # Use a port like 10000 for Render
+    app.run(host='0.0.0.0', port=port, debug=False) # Set debug=True while testing locally

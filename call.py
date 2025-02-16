@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from models import User, Location,State,TravelData,Tag, UserTags
 from main import engine  
+import os
 import uvicorn
 from typing import List
 
@@ -458,5 +459,6 @@ async def get_user_tags(username: str, db: Session = Depends(get_db)):
     return user.tags
 #
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5003)
+    port = int(os.environ.get('PORT', 10000))
+uvicorn.run(app, host="0.0.0.0", port=port, debug=False)
 # """
