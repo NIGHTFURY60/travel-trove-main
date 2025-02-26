@@ -2,8 +2,6 @@
 
 echo "Starting Python scripts..."
 
-# Activate virtual environment (modify path if needed)
-source venv/bin/activate #for linux
 
 
 
