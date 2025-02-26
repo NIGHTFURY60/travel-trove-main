@@ -1,6 +1,16 @@
 #!/bin/bash
-python app.py &
+
+echo "Starting Python scripts..."
+
+# Activate virtual environment (modify path if needed)
+source venv/bin/activate #for linux
+
+
+
+# Run Python scripts in the background
 python call.py &
+python app.py &
 python server.py &
-pip install -r requirements.txt
-wait
+
+echo "All scripts started!"
+wait  # Ensures the script keeps running
