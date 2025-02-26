@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const postForm = document.getElementById("postForm");
     const postTemplate = document.getElementById("postTemplate");
     
-    const API_BASE_URL = "https://travel-trove-6y02.onrender.com/"; // Update with your backend URL
+    const API_BASE_URL = "https://travel-trove-6y02.onrender.com"; // Update with your backend URL
 
     async function fetchPosts() {
         try {
