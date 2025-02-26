@@ -511,7 +511,7 @@
         }
         try {
           // Call backend endpoint to save user tags.
-          const response = await fetch("http://127.0.0.1:5003/user/tags", {
+          const response = await fetch("https://travel-trove-6y02.onrender.com/user/tags", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -553,7 +553,7 @@
           return;
         }
         try {
-          const response = await fetch(`http://127.0.0.1:5003/passcheck/${encodeURIComponent(username)}/${encodeURIComponent(password)}`);
+          const response = await fetch(`https://travel-trove-6y02.onrender.com/passcheck/${encodeURIComponent(username)}/${encodeURIComponent(password)}`);
           const result = await response.json();
           if (response.ok) {
             localStorage.setItem("username", result);
@@ -597,7 +597,7 @@
           return;
         }
         try {
-          const response = await fetch("http://127.0.0.1:5003/register/", {
+          const response = await fetch("https://travel-trove-6y02.onrender.com/register/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userData)
