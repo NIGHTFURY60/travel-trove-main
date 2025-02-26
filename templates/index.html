@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Travel Platform - Home</title>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">TravelPlatform</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="forum.html">Forum</a>
+            <a href="profile.html">Profile</a>
+            <a href="booking.html">Booking</a>
+            <a href="market.html">Market</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+            <button>Search</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Travel Recommendations</h1>
+ <!-- Sorting and Filtering Section -->
+ <div class="filter-section">
+    <label for="sortOptions">Sort By:</label>
+    <select id="sortOptions" onchange="fetchPosts()">
+        <option value="date">Date</option>
+        <option value="popularity">Popularity</option>
+    </select>
+    <label for="filterOptions">Filter By Tags:</label>
+    <select id="filterOptions" onchange="fetchPosts()">
+        <option value="">All</option>
+        <option value="hiking">Hiking</option>
+        <option value="swimming">Swimming</option>
+        <option value="viewpoints">Viewpoints</option>
+        <option value="cultural">Cultural</option>
+        <option value="adventure">Adventure</option>
+    </select>
+</div>
+
+<h1>Trending Locations</h1>
+    <div id="trendingPosts" class="post-container"></div>
+
+    <h1>Recommended Locations</h1>
+    <div id="recommendedPosts" class="post-container"></div>
+
+    <!-- <script>
+        async function fetchPosts() {
+            const response = await fetch('http://127.0.0.1:5000/posts');
+            const data = await response.json();
+            displayPosts(data.trendingPosts, 'trending');
+            displayPosts(data.recommendedPosts, 'recommended');
+        }
+
+        function displayPosts(posts, containerId) {
+            const container = document.getElementById(containerId);
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post';
+                postDiv.innerHTML = `<h2>${post.title}</h2><p>Upvotes: ${post.upvotes}</p>`;
+                container.appendChild(postDiv);
+            });
+        }
+
+        fetchPosts();
+    </script> -->
+    <script src="script.js"></script>
+</body>
+
+</html>
