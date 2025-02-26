@@ -101,8 +101,7 @@ def get_file(file_id):
         file = fs.get(ObjectId(file_id))
         response = app.response_class(
             file.read(), content_type=file.content_type)
-        response.headers["Content-Disposition"] = f"inline; filename={
-            file.filename}"
+        response.headers["Content-Disposition"] = f"inline; filename={file.filename}"
         return response
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 404
